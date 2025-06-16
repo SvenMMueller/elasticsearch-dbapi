@@ -131,6 +131,7 @@ class Cursor(BaseCursor):
     def __init__(self, url: str, es: Elasticsearch, **kwargs: Any) -> None:
         super().__init__(url, es, **kwargs)
         self.sql_path = kwargs.get("sql_path") or "_opendistro/_sql"
+        self.table_prefix = kwargs.get("table_prefix", "")
         # Opendistro SQL v2 flag
         self.v2 = kwargs.get("v2", False)
         if self.v2:
@@ -145,7 +146,8 @@ class Cursor(BaseCursor):
 
         https://github.com/preset-io/elasticsearch-dbapi/issues/38
         """
-        results = self.execute("SHOW TABLES LIKE %")
+        prefix = self.table_prefix
+        results = self.execute(f"SHOW TABLES LIKE {prefix}%")
         response = self.es.cat.indices(format="json")
 
         _results = []
